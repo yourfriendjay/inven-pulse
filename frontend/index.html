@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inven-Pulse | Aion 2 Market Research</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .view-section { display: none; }
+        .view-section.active { display: block; animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .heatmap-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top:20px; }
+        .heat-box { padding: 40px; border-radius: 8px; text-align: center; font-weight: 600; color: white; }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar glass-panel">
+            <div class="logo">
+                <span class="logo-accent" style="color:#3182ce;">INVEN</span>PULSE
+            </div>
+            <nav class="nav-menu">
+                <a href="#" class="nav-item active" data-target="view-dashboard">📊 Dashboard</a>
+                <a href="#" class="nav-item" data-target="view-intent">🎯 Intent Console</a>
+                <a href="#" class="nav-item" data-target="view-heatmaps">🗺 Heatmaps</a>
+                <a href="#" class="nav-item" data-target="view-audit">🔍 Audit Logs</a>
+                <a href="#" class="nav-item" data-target="view-settings">⚙️ Settings</a>
+            </nav>
+            <div class="agent-status">
+                <div class="status-indicator online"></div>
+                <span>Pipeline: Active</span>
+            </div>
+        </aside>
+
+        <!-- Main -->
+        <main class="main-content">
+            <!-- Global Topbar (Always Visible) -->
+            <header class="topbar glass-panel flex-row" style="margin-bottom: 20px;">
+                <div class="project-selector">
+                    <label>Target Competitor:</label>
+                    <select id="gameSelector">
+                        <option value="">All Games (Overview)</option>
+                        <option value="aion2">Aion 2 (아이온 2)</option>
+                        <option value="lostark">Lost Ark (로스트아크)</option>
+                        <option value="tl">Throne & Liberty (TL)</option>
+                        <option value="black">Black Desert (검은사막)</option>
+                    </select>
+                </div>
+                <div class="date-range">
+                    <label>📅 Timeline:</label>
+                    <select id="dateSelector" style="background: #ffffff; color: var(--text-main); border: 1px solid var(--border-color); padding: 8px 12px; border-radius: 4px; outline: none; font-weight: 500; font-family: inherit; margin-left: 10px; cursor: pointer;">
+                        <option value="7">Last 1 Week</option>
+                        <option value="14">Last 2 Weeks</option>
+                        <option value="21">Last 3 Weeks</option>
+                        <option value="28">Last 4 Weeks</option>
+                        <option value="56">Last 8 Weeks</option>
+                        <option value="84">Last 12 Weeks</option>
+                    </select>
+                </div>
+            </header>
+
+            <!-- 1. DASHBOARD VIEW -->
+            <div id="view-dashboard" class="view-section active">
+                <section class="kpi-grid" style="margin-bottom:24px;">
+                    <div class="kpi-card glass-panel">
+                        <h3>Total Posts Scraped</h3>
+                        <div class="kpi-value" id="kpiTotal">—</div>
+                        <div class="kpi-trend" id="kpiTotalSub">Loading...</div>
+                    </div>
+                    <div class="kpi-card glass-panel">
+                        <h3>Overall Sentiment</h3>
+                        <div class="kpi-value" id="kpiSentiment">—</div>
+                        <div class="kpi-trend" id="kpiSentimentSub">Loading...</div>
+                    </div>
+                    <div class="kpi-card glass-panel alert-red">
+                        <h3>Churn Risk Posts</h3>
+                        <div class="kpi-value text-red" id="kpiChurn">—</div>
+                        <div class="kpi-trend" id="kpiChurnSub">Loading...</div>
+                    </div>
+                    <div class="kpi-card glass-panel highlight-blue">
+                        <h3>Loyalty Signals</h3>
+                        <div class="kpi-value text-blue" id="kpiLoyalty">—</div>
+                        <div class="kpi-trend" id="kpiLoyaltySub">Loading...</div>
+                    </div>
+                </section>
+
+                <section class="charts-section flex-row">
+                    <div class="chart-container glass-panel flex-2">
+                        <div class="section-header">
+                            <h2>Feature Sentiment by Category</h2>
+                            <span class="subtitle">Average sentiment per feature dimension based on real-time DB queries.</span>
+                        </div>
+                        <div class="canvas-wrapper" style="height: 300px;">
+                            <canvas id="sentimentChart"></canvas>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- 2. INTENT CONSOLE VIEW -->
+            <div id="view-intent" class="view-section">
+                <div class="intent-console glass-panel" style="padding: 40px;">
+                    <div class="section-header">
+                        <h2>🤖 Vibe Coding Intent Console</h2>
+                        <span class="subtitle">Issue natural language commands to the Antigravity Agent. (Demo)</span>
+                    </div>
+                    <textarea style="height: 150px; font-size: 16px; margin-top:20px;" placeholder="e.g., 'Analyze the community reaction to the newest Aion 2 flight mechanics and give me a summary...'"></textarea>
+                    <button class="btn-primary" style="padding: 15px; font-size: 16px;">Execute Custom LLM Instruction</button>
+                    
+                    <div class="recent-intents" style="margin-top:40px;">
+                        <h4>Agent Execution History</h4>
+                        <div style="background:#f8fafc; padding:15px; border-radius:8px; margin-bottom:10px; border-left:4px solid #3182ce;">
+                            <strong>[Success]</strong> "Compare TL vs Lost Ark monetization" - Generated 4 page report.
+                        </div>
+                        <div style="background:#f8fafc; padding:15px; border-radius:8px; margin-bottom:10px; border-left:4px solid #38a169;">
+                            <strong>[Success]</strong> "Run daily churn detection on Black Desert" - Applied rule to pipeline.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. HEATMAPS VIEW -->
+            <div id="view-heatmaps" class="view-section">
+                <div class="glass-panel" style="padding: 40px;">
+                    <div class="section-header">
+                        <h2>🗺 Topic Sentiment Heatmaps</h2>
+                        <span class="subtitle">Emotional intensity mapping across different gaming features.</span>
+                    </div>
+                    <div class="heatmap-grid" id="heatmapContainer">
+                        <!-- Heatmap boxes generated by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. AUDIT LOGS VIEW -->
+            <div id="view-audit" class="view-section">
+                <section class="audit-logs glass-panel">
+                    <div class="section-header">
+                        <h2>🔍 Verbatim Audit Trail</h2>
+                        <span class="subtitle">Transparent LLM Classification Reasoning (Glass Box AI)</span>
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Score</th>
+                                    <th>Game</th>
+                                    <th>Category</th>
+                                    <th>Verbatim (Snippet)</th>
+                                    <th>AI Reasoning</th>
+                                    <th>Signal</th>
+                                </tr>
+                            </thead>
+                            <tbody id="auditTableBody">
+                                <tr><td colspan="6" style="text-align:center; padding:40px; color: var(--text-muted);">Loading data from backend...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
+
+            <!-- 5. SETTINGS VIEW -->
+            <div id="view-settings" class="view-section">
+                <div class="glass-panel" style="padding: 40px; max-width: 600px;">
+                    <div class="section-header">
+                        <h2>⚙️ System Parameters</h2>
+                        <span class="subtitle">Configure AI Pipeline limits and API Keys (Local Storage)</span>
+                    </div>
+                    
+                    <div style="margin-top: 30px;">
+                        <label style="font-weight:600; font-size:13px; color:#4a5568; margin-bottom:8px; display:block;">OpenAI API Key</label>
+                        <input type="password" value="sk-your-openai-key-here" style="width:100%; padding:12px; border:1px solid #e2e8f0; border-radius:6px; margin-bottom:20px;">
+                        
+                        <label style="font-weight:600; font-size:13px; color:#4a5568; margin-bottom:8px; display:block;">Web Scraper Target Interval (Seconds)</label>
+                        <input type="number" value="3600" style="width:100%; padding:12px; border:1px solid #e2e8f0; border-radius:6px; margin-bottom:20px;">
+
+                        <label style="font-weight:600; font-size:13px; color:#4a5568; margin-bottom:8px; display:block;">Active LLM Model</label>
+                        <select style="width:100%; padding:12px; border:1px solid #e2e8f0; border-radius:6px; margin-bottom:30px; background:white;">
+                            <option>gpt-4o-mini (Cost Efficient)</option>
+                            <option>gpt-4o (High Reasoning)</option>
+                            <option>claude-3-5-sonnet (Best Nuance)</option>
+                        </select>
+
+                        <button class="btn-primary">Save Configuration</button>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script src="/js/app.js"></script>
+</body>
+</html>
